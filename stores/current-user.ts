@@ -1,17 +1,16 @@
 import { jwtDecode } from "jwt-decode";
 import _ from "lodash";
 export interface Credential {
-  email: string;
+  username: string;
   password: string;
 }
 export interface Profile {
   id: string;
   name: string;
+  username: string;
   email: string;
   iat: number;
   exp: number;
-  role: string;
-  status: string;
 }
 
 export const useCurrentUserStore = defineStore("useCurrentUserStore", () => {
