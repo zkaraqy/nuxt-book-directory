@@ -22,10 +22,8 @@ export default defineEventHandler(async (event) => {
     user &&
     (await comparePassword(data.password, user?.dataValues.password!))
   ) {
-    
-    const accessToken = encodeAccessToken(user.toJSON(), event);
+    const accessToken = encodeAccessToken(user, event);
     const refreshToken = encodeRefreshToken(user.dataValues.id!.toString());
-
     return {
       accessToken,
       refreshToken,
