@@ -2,12 +2,18 @@
 definePageMeta({
   layout: "login"
 });
+
+useHead({
+  title: "Login | Book Directory"
+})
+
 import Swal from 'sweetalert2';
-import { Loader2 } from 'lucide-vue-next'
+import { Loader2, Eye, EyeOff, Send } from 'lucide-vue-next'
 
 const credential = ref({ username: "", password: "" });
 const isLoading: Ref<boolean> = ref(false);
 const errorMessage: Ref<string | undefined> = ref();
+const showPassword = ref(false)
 
 const { authenticate } = useCurrentUserStore();
 
@@ -22,7 +28,7 @@ const login = async () => {
         title: "Sukses",
         text: "Anda Berhasil Login",
       }).then(() => {
-        navigateTo("/user");
+        navigateTo("/");
       });
     })
     .catch((error) => {
@@ -46,12 +52,13 @@ const login = async () => {
       <CardDescription>Login with you account to have access to you collection and profile.</CardDescription>
     </CardHeader>
     <CardContent>
-      <form @submit="">
+      <div>
         <FormField name="form">
           <FormItem class="mb-2">
             <FormLabel>Username</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Username" v-model="credential.username" />
+              <Input class="h-full" type="text" placeholder="Username" autocomplete="off" v-model="credential.username"
+                @keydown.enter="login" />
             </FormControl>
             <FormDescription>
               Enter your username.
@@ -60,9 +67,15 @@ const login = async () => {
           </FormItem>
           <FormItem>
             <FormLabel>Password</FormLabel>
-            <FormControl>
-              <Input type="password" placeholder="Password" v-model="credential.password" />
-            </FormControl>
+            <div class="flex flex-row gap-2">
+              <Input class="h-full" :type="showPassword ? 'text' : 'password'" placeholder="Password" autocomplete="off"
+                v-model="credential.password" @keydown.enter="login" />
+              <Button @click="() => { showPassword = !showPassword }" variant="outline" class="aspect-square flex"
+                :title="!showPassword ? 'unhide password' : 'hide password'">
+                <Eye v-if="!showPassword" />
+                <EyeOff v-else />
+              </Button>
+            </div>
             <FormDescription class="flex justify-between">
               <p>Enter your password.</p>
               <Button variant="link" class="px-0" @click="navigateTo('#')">Forgot password?</Button>
@@ -73,10 +86,11 @@ const login = async () => {
         <div class="flex justify-end">
           <Button type="button" @click="login" v-bind:disabled="isLoading">
             <Loader2 class="w-4 h-4 mr-2 animate-spin" v-if="isLoading" />
+            <Send v-else />
             Submit
           </Button>
         </div>
-      </form>
+      </div>
     </CardContent>
     <CardFooter class="mx-0 px-2 flex justify-between">
       <Button variant="link" @click="navigateTo('/')">Back to home</Button>

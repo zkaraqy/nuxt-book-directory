@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import Swal from 'sweetalert2';
+import { Loader2, Eye, EyeOff, Send } from 'lucide-vue-next';
 
 definePageMeta({
   layout: "login"
 })
 
+useHead({
+  title: "Register | Book Directory"
+})
+
 const { authenticate } = useCurrentUserStore()
 const isLoading: Ref<boolean> = ref(false);
+const showPassword = ref(false)
+const showConfirmationPassword = ref(false)
 
 interface ValidationMessages {
   username?: string;
@@ -36,6 +43,7 @@ const model: Ref<{
 const regist = async () => {
   model.value.password = model.value.password;
   validation.value = {}
+  isLoading.value = true;
   try {
     await $fetch('/api/auth/registrasi', { method: 'post', body: model.value })
     await authenticate({ username: model.value.username, password: model.value.password })
@@ -45,7 +53,7 @@ const regist = async () => {
           title: "Login Success",
           text: "You have successfully logged in",
         }).then(() => {
-          navigateTo("/user");
+          navigateTo("/");
         });
       })
       .catch((error) => {
@@ -57,6 +65,8 @@ const regist = async () => {
       })
   } catch (err: any) {
     Swal.fire("Informasi", err.data.message ?? err.message, "error");
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -69,12 +79,12 @@ const regist = async () => {
       <CardDescription>Regist a new account.</CardDescription>
     </CardHeader>
     <CardContent>
-      <form @submit="">
+      <div>
         <FormField name="form">
           <FormItem class="mb-2">
             <FormLabel>Name</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Name" v-model="model.name" />
+              <Input type="text" placeholder="Name" autocomplete="off" v-model="model.name" @keydown.enter="regist" />
             </FormControl>
             <FormDescription>
               Enter your name.
@@ -84,7 +94,7 @@ const regist = async () => {
           <FormItem class="mb-2">
             <FormLabel>Username</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Username" v-model="model.username" />
+              <Input type="text" placeholder="Username" autocomplete="off" v-model="model.username" @keydown.enter="regist" />
             </FormControl>
             <FormDescription>
               Enter your username.
@@ -94,7 +104,7 @@ const regist = async () => {
           <FormItem class="mb-2">
             <FormLabel>Email</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Email" v-model="model.email" />
+              <Input type="text" placeholder="Email" autocomplete="off" v-model="model.email" @keydown.enter="regist" />
             </FormControl>
             <FormDescription>
               Enter your email.
@@ -104,35 +114,46 @@ const regist = async () => {
           <div class="flex gap-4">
             <FormItem class="flex-1">
               <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="Password" v-model="model.password" />
-              </FormControl>
-              <FormDescription>
-                Enter your password.
+              <div class="flex flex-row gap-2">
+                <Input :type="showPassword ? 'text' : 'password'" placeholder="Password" autocomplete="off" v-model="model.password"
+                  @keydown.enter="regist" />
+                <Button :title="!showPassword ? 'unhide password' : 'hide password'" @click="() => { showPassword = !showPassword }" variant="outline">
+                  <Eye v-if="!showPassword" />
+                  <EyeOff v-else />
+                </Button>
+              </div>
+              <FormDescription class="flex justify-between">
+                <p>Enter your password.</p>
               </FormDescription>
               <FormMessage />
             </FormItem>
             <FormItem class="flex-1">
               <FormLabel>Confirm Password</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="Password" v-model="model.confirmPassword" />
-              </FormControl>
-              <FormDescription>
-                Enter a confirmation password.
+              <div class="flex flex-row gap-2">
+                <Input :type="showConfirmationPassword ? 'text' : 'password'" placeholder="Repeat pbassword"
+                  v-model="model.confirmPassword" @keydown.enter="regist" />
+                <Button :title="!showConfirmationPassword ? 'unhide confirmation password' : 'hide confirmation password'" @click="() => { showConfirmationPassword = !showConfirmationPassword }" variant="outline">
+                  <Eye v-if="!showConfirmationPassword" />
+                  <EyeOff v-else />
+                </Button>
+              </div>
+              <FormDescription class="flex justify-between">
+                <p>Enter confirmation password.</p>
               </FormDescription>
               <FormMessage />
             </FormItem>
           </div>
         </FormField>
-        <div class="flex justify-end">
+        <div class="flex justify-end mt-4">
           <Button type="button" @click="regist" v-bind:disabled="isLoading">
             <Loader2 class="w-4 h-4 mr-2 animate-spin" v-if="isLoading" />
+            <Send v-else />
             Submit
           </Button>
         </div>
-      </form>
+      </div>
     </CardContent>
-    <CardFooter class="flex justify-between">
+    <CardFooter class="mx-0 px-2 flex justify-between">
       <Button variant="link" @click="navigateTo('/')">Back to home</Button>
       <Button variant="link" @click="navigateTo('/login')">Have an account?</Button>
     </CardFooter>
