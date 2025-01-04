@@ -3,7 +3,7 @@
     <Sidebar collapsible="icon">
       <SidebarContent class="mt-4">
         <SidebarGroup>
-          <SidebarGroupLabel>Platform</SidebarGroupLabel>
+          <SidebarGroupLabel>Library</SidebarGroupLabel>
           <SidebarMenu>
             <Collapsible v-for="item in data.navMain" :key="item.title" as-child :default-open="item.isActive"
               class="group/collapsible">
@@ -21,6 +21,7 @@
                     <SidebarMenuSubItem v-for="subItem in item.items" :key="subItem.title">
                       <SidebarMenuSubButton as-child>
                         <a :href="subItem.url">
+                          <component :is="subItem.icon" />
                           <span>{{ subItem.title }}</span>
                         </a>
                       </SidebarMenuSubButton>
@@ -29,48 +30,6 @@
                 </CollapsibleContent>
               </SidebarMenuItem>
             </Collapsible>
-          </SidebarMenu>
-        </SidebarGroup>
-        <SidebarGroup class="group-data-[collapsible=icon]:hidden">
-          <SidebarGroupLabel>Projects</SidebarGroupLabel>
-          <SidebarMenu>
-            <SidebarMenuItem v-for="item in data.projects" :key="item.name">
-              <SidebarMenuButton as-child>
-                <a :href="item.url">
-                  <component :is="item.icon" />
-                  <span>{{ item.name }}</span>
-                </a>
-              </SidebarMenuButton>
-              <DropdownMenu>
-                <DropdownMenuTrigger as-child>
-                  <SidebarMenuAction show-on-hover>
-                    <MoreHorizontal />
-                    <span class="sr-only">More</span>
-                  </SidebarMenuAction>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent class="w-48 rounded-lg" side="bottom" align="end">
-                  <DropdownMenuItem>
-                    <Folder class="text-muted-foreground" />
-                    <span>View Project</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Forward class="text-muted-foreground" />
-                    <span>Share Project</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Trash2 class="text-muted-foreground" />
-                    <span>Delete Project</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton class="text-sidebar-foreground/70">
-                <MoreHorizontal class="text-sidebar-foreground/70" />
-                <span>More</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
@@ -96,44 +55,14 @@
               </DropdownMenuTrigger>
               <DropdownMenuContent class="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg" side="bottom"
                 align="end" :side-offset="4">
-                <DropdownMenuLabel class="p-0 font-normal">
-                  <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                    <Avatar class="h-8 w-8 rounded-lg">
-                      <AvatarImage :src="data.user.avatar" :alt="data.user.name" />
-                      <AvatarFallback class="rounded-lg">
-                        CN
-                      </AvatarFallback>
-                    </Avatar>
-                    <div class="grid flex-1 text-left text-sm leading-tight">
-                      <span class="truncate font-semibold">{{ data.user.name }}</span>
-                      <span class="truncate text-xs">{{ data.user.email }}</span>
-                    </div>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <Sparkles />
-                    Upgrade to Pro
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem @click="navigateTo('/user/account')">
                     <BadgeCheck />
                     Account
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <CreditCard />
-                    Billing
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Bell />
-                    Notifications
-                  </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem @click="logoutAkun">
                   <LogOut />
                   Log out
                 </DropdownMenuItem>
@@ -155,218 +84,64 @@
 
 <script setup lang=ts>
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/components/ui/avatar'
-
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
-
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Separator } from '@/components/ui/separator'
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuAction,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarProvider,
-  SidebarRail,
-  SidebarTrigger,
-} from '@/components/ui/sidebar'
-import {
-  AudioWaveform,
   BadgeCheck,
-  Bell,
-  BookOpen,
-  Bot,
   ChevronRight,
   ChevronsUpDown,
-  Command,
-  CreditCard,
-  Folder,
-  Forward,
-  Frame,
-  GalleryVerticalEnd,
   LogOut,
-  Map,
-  MoreHorizontal,
-  PieChart,
-  Plus,
-  Settings2,
-  Sparkles,
-  SquareTerminal,
-  Trash2,
+  LibraryBig,
+  Heart,
+  Album
 } from 'lucide-vue-next'
-import { ref } from 'vue'
+import Swal from 'sweetalert2';
 
-// This is sample data.
+const useStore = useCurrentUserStore();
+const { profile, logout } = useStore
+const { name, email } = profile
+
 const data = {
   user: {
-    name: 'Azka',
-    email: 'm@example.com',
+    name: name,
+    email: email,
     avatar: 'shadcn.jpg',
   },
-  teams: [
-    {
-      name: 'Acme Inc',
-      logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
-    },
-    {
-      name: 'Acme Corp.',
-      logo: AudioWaveform,
-      plan: 'Startup',
-    },
-    {
-      name: 'Evil Corp.',
-      logo: Command,
-      plan: 'Free',
-    },
-  ],
   navMain: [
     {
-      title: 'Playground',
+      title: 'Collections',
       url: '#',
-      icon: SquareTerminal,
+      icon: LibraryBig,
       isActive: true,
       items: [
         {
-          title: 'History',
-          url: '#',
+          title: 'Favorites',
+          icon: Heart,
+          url: '/user/favorites',
         },
         {
-          title: 'Starred',
-          url: '#',
-        },
-        {
-          title: 'Settings',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Models',
-      url: '#',
-      icon: Bot,
-      items: [
-        {
-          title: 'Genesis',
-          url: '#',
-        },
-        {
-          title: 'Explorer',
-          url: '#',
-        },
-        {
-          title: 'Quantum',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Documentation',
-      url: '#',
-      icon: BookOpen,
-      items: [
-        {
-          title: 'Introduction',
-          url: '#',
-        },
-        {
-          title: 'Get Started',
-          url: '#',
-        },
-        {
-          title: 'Tutorials',
-          url: '#',
-        },
-        {
-          title: 'Changelog',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Settings',
-      url: '#',
-      icon: Settings2,
-      items: [
-        {
-          title: 'General',
-          url: '#',
-        },
-        {
-          title: 'Team',
-          url: '#',
-        },
-        {
-          title: 'Billing',
-          url: '#',
-        },
-        {
-          title: 'Limits',
-          url: '#',
+          title: 'Readlist',
+          icon: Album,
+          url: '/user/readlist',
         },
       ],
     },
   ],
-  projects: [
-    {
-      name: 'Design Engineering',
-      url: '#',
-      icon: Frame,
-    },
-    {
-      name: 'Sales & Marketing',
-      url: '#',
-      icon: PieChart,
-    },
-    {
-      name: 'Travel',
-      url: '#',
-      icon: Map,
-    },
-  ],
 }
 
-const activeTeam = ref(data.teams[0])
-
-function setActiveTeam(team: typeof data.teams[number]) {
-  activeTeam.value = team
+function logoutAkun() {
+  Swal.fire({
+    title: "Logout",
+    text: "Apakah anda yakin ingin keluar?",
+    showCancelButton: true,
+    confirmButtonText: "Ya",
+    icon: "question"
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      await logout().then(() => {
+        Swal.fire("Logout Berhasil", "", "success");
+        navigateTo('/')
+      })
+    }
+  });
 }
-
-const userStore = useCurrentUserStore();
 </script>
 
 <style></style>

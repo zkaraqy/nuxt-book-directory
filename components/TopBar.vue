@@ -7,47 +7,60 @@
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem class="hidden md:block">
-            <BreadcrumbLink href="#">
-              Building Your Application
+            <BreadcrumbLink href="#" class="text-2xl">
+              Book Directory
             </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator class="hidden md:block" />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Data Fetching</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
     </div>
     <div class="px-4 flex gap-2">
       <SelectTheme />
+      <Button v-if="isLogged()" class="p-2 aspect-square"
+        :title="$route.path.includes('/user') ? 'Home' : 'Profile'"
+        @click="navigateTo($route.path.includes('/user') ? '/' : '/user')" variant="outline">
+        <Home v-if="$route.path.includes('/user')" />
+        <UserRound v-if="$route.path === '/'" />
+      </Button>
       <Button v-if="!isLogged()" variant="outline" @click="navigateTo('/register')">Register</Button>
-      <Button v-if="!isLogged()" @click="navigateTo('/login')">Login</Button>
-      <Button v-if="isLogged()" variant="destructive" @click="logoutAkun">Logout</Button>
+      <Button v-if="!isLogged()" @click="navigateTo('/login')">
+        <LogIn /> Login
+      </Button>
+      <Button v-if="isLogged()" variant="destructive" @click="logoutAkun" v-bind:disabled="isLoading">
+        <Loader2 class="animate-spin" v-if="isLoading" />
+        <LogOut v-else /> Logout
+      </Button>
     </div>
   </header>
 </template>
 
 <script lang="ts" setup>
+import { Loader2, UserRound, Home, LogOut, LogIn } from 'lucide-vue-next';
 import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 import Swal from 'sweetalert2';
-const route = useRoute()
+const route = useRoute();
+const isLoading = ref(false);
 const { isLogged, logout } = useCurrentUserStore();
 
 function logoutAkun() {
+  isLoading.value = true
   Swal.fire({
     title: "Logout",
     text: "Apakah anda yakin ingin keluar?",
     showCancelButton: true,
     confirmButtonText: "Ya",
     icon: "question"
-  }).then((result) => {
+  }).then(async (result) => {
     if (result.isConfirmed) {
-      logout().then(() => {
+      await logout().then(() => {
         Swal.fire("Logout Berhasil", "", "success");
+        isLoading.value = false;
         navigateTo('/')
       })
+    } else {
+      isLoading.value = false
     }
   });
 }
