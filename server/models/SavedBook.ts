@@ -23,6 +23,7 @@ export class SavedBook extends Model<
   declare bookId: string;
   declare type: "Favorites" | "Readlist";
   declare status: "waiting" | "reading" | "paused" | "finished" | "rereading";
+  declare userId: number | null;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 
@@ -63,6 +64,9 @@ export class SavedBook extends Model<
             "rereading"
           ),
           allowNull: false,
+        },
+        userId: {
+          type: DataTypes.INTEGER,
         },
         createdAt: {
           type: DataTypes.DATE,

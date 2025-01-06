@@ -4,7 +4,7 @@
     <div class="flex items-center gap-2 px-4">
       <SidebarTrigger class="-ml-1" v-if="$route.path.includes('/user')" />
       <Separator orientation="vertical" class="mr-2 h-4" />
-      <Breadcrumb>
+      <Breadcrumb v-if="!$route.path.includes('/user')">
         <BreadcrumbList>
           <BreadcrumbItem class="hidden md:block">
             <BreadcrumbLink href="#" class="text-2xl">
@@ -17,7 +17,7 @@
     <div class="px-4 flex gap-2">
       <SelectTheme />
       <Button v-if="isLogged()" class="p-2 aspect-square"
-        :title="$route.path.includes('/user') ? 'Home' : 'Profile'"
+        :title="$route.path.includes('/user') ? 'Home' : 'User'"
         @click="navigateTo($route.path.includes('/user') ? '/' : '/user')" variant="outline">
         <Home v-if="$route.path.includes('/user')" />
         <UserRound v-if="$route.path === '/'" />
