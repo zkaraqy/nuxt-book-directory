@@ -3,8 +3,15 @@
     <Sidebar collapsible="icon">
       <SidebarContent class="mt-4">
         <SidebarGroup>
-          <SidebarGroupLabel>Library</SidebarGroupLabel>
+          <SidebarGroupLabel>Book Directory</SidebarGroupLabel>
           <SidebarMenu>
+            <SidebarMenuItem>
+              <NuxtLink href="/user">
+                <SidebarMenuButton>
+                  <LayoutDashboard />Dashboard
+                </SidebarMenuButton>
+              </NuxtLink>
+            </SidebarMenuItem>
             <Collapsible v-for="item in data.navMain" :key="item.title" as-child :default-open="item.isActive"
               class="group/collapsible">
               <SidebarMenuItem>
@@ -20,10 +27,10 @@
                   <SidebarMenuSub>
                     <SidebarMenuSubItem v-for="subItem in item.items" :key="subItem.title">
                       <SidebarMenuSubButton as-child>
-                        <a :href="subItem.url">
+                        <NuxtLink :href="subItem.url">
                           <component :is="subItem.icon" />
                           <span>{{ subItem.title }}</span>
-                        </a>
+                        </NuxtLink>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   </SidebarMenuSub>
@@ -56,9 +63,9 @@
               <DropdownMenuContent class="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg" side="bottom"
                 align="end" :side-offset="4">
                 <DropdownMenuGroup>
-                  <DropdownMenuItem @click="navigateTo('/user/account')">
+                  <DropdownMenuItem @click="navigateTo('/user/profile')">
                     <BadgeCheck />
-                    Account
+                    Profile
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
@@ -90,7 +97,8 @@ import {
   LogOut,
   LibraryBig,
   Heart,
-  Album
+  Album,
+  LayoutDashboard
 } from 'lucide-vue-next'
 import Swal from 'sweetalert2';
 
