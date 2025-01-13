@@ -18,9 +18,9 @@ const showConfirmationPassword = ref(false)
 interface ValidationMessages {
   username?: string;
   name?: string;
+  email?: string;
   password?: string;
   confirmPassword?: string;
-  email?: string;
 }
 
 const validation = ref<ValidationMessages>({});
@@ -64,7 +64,17 @@ const regist = async () => {
         });
       })
   } catch (err: any) {
-    Swal.fire("Informasi", err.data.message ?? err.message, "error");
+    validation.value = {}
+    Swal.fire("Information", err.data.message ?? err.message, "error");
+    const errorData = err.data;
+    if (errorData.statusCode === 422) {
+      for (let i = 0; i < errorData.data.length; i++) {
+        const keyPath: 'username' | 'name' | 'password' | 'confirmPassword' = errorData.data[i].path[0]
+        const errMessage: string = errorData.data[i].message;
+        validation.value[keyPath] = errMessage;
+      }
+    }
+    console.log(validation.value)
   } finally {
     isLoading.value = false;
   }
@@ -84,63 +94,62 @@ const regist = async () => {
           <FormItem class="mb-2">
             <FormLabel>Name</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Name" autocomplete="off" v-model="model.name" @keydown.enter="regist" />
+              <Input :class="validation.username ? 'border-destructive' : 'border-input'" type="text" placeholder="Enter your name." autocomplete="off" v-model="model.name" @keydown.enter="regist" />
             </FormControl>
-            <FormDescription>
-              Enter your name.
+            <FormDescription class="flex sm:justify-start sm:items-center flex-col sm:flex-row">
+              <span class="text-destructive">{{ validation.name }}</span>
             </FormDescription>
-            <FormMessage />
           </FormItem>
           <FormItem class="mb-2">
             <FormLabel>Username</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Username" autocomplete="off" v-model="model.username" @keydown.enter="regist" />
+              <Input :class="validation.username ? 'border-destructive' : 'border-input'" type="text" placeholder="Enter your username." autocomplete="off" v-model="model.username"
+                @keydown.enter="regist" />
             </FormControl>
-            <FormDescription>
-              Enter your username.
+            <FormDescription class="flex sm:justify-start sm:items-center flex-col sm:flex-row">
+              <span class="text-destructive">{{ validation.username }}</span>
             </FormDescription>
-            <FormMessage />
           </FormItem>
           <FormItem class="mb-2">
             <FormLabel>Email</FormLabel>
             <FormControl>
-              <Input type="text" placeholder="Email" autocomplete="off" v-model="model.email" @keydown.enter="regist" />
+              <Input :class="validation.username ? 'border-destructive' : 'border-input'" type="text" placeholder="Enter your email." autocomplete="off" v-model="model.email" @keydown.enter="regist" />
             </FormControl>
-            <FormDescription>
-              Enter your email.
+            <FormDescription class="flex sm:justify-start sm:items-center flex-col sm:flex-row">
+              <span class="text-destructive">{{ validation.email }}</span>
             </FormDescription>
-            <FormMessage />
           </FormItem>
           <div class="flex gap-4">
             <FormItem class="flex-1">
               <FormLabel>Password</FormLabel>
               <div class="flex flex-row gap-2">
-                <Input :type="showPassword ? 'text' : 'password'" placeholder="Password" autocomplete="off" v-model="model.password"
-                  @keydown.enter="regist" />
-                <Button :title="!showPassword ? 'unhide password' : 'hide password'" @click="() => { showPassword = !showPassword }" variant="outline">
+                <Input :class="validation.username ? 'border-destructive' : 'border-input'" :type="showPassword ? 'text' : 'password'" placeholder="Enter your password." autocomplete="off"
+                  v-model="model.password" @keydown.enter="regist" />
+                <Button :title="!showPassword ? 'unhide password' : 'hide password'"
+                  @click="() => { showPassword = !showPassword }" variant="outline">
                   <Eye v-if="!showPassword" />
                   <EyeOff v-else />
                 </Button>
               </div>
-              <FormDescription class="flex justify-between">
-                <p>Enter your password.</p>
+              <FormDescription class="flex flex-col">
+                <span class="text-destructive">{{ validation.password }}</span>
               </FormDescription>
-              <FormMessage />
             </FormItem>
             <FormItem class="flex-1">
               <FormLabel>Confirm Password</FormLabel>
               <div class="flex flex-row gap-2">
-                <Input :type="showConfirmationPassword ? 'text' : 'password'" placeholder="Repeat pbassword"
+                <Input :class="validation.username ? 'border-destructive' : 'border-input'" :type="showConfirmationPassword ? 'text' : 'password'" placeholder="Enter your confirmation password."
                   v-model="model.confirmPassword" @keydown.enter="regist" />
-                <Button :title="!showConfirmationPassword ? 'unhide confirmation password' : 'hide confirmation password'" @click="() => { showConfirmationPassword = !showConfirmationPassword }" variant="outline">
+                <Button
+                  :title="!showConfirmationPassword ? 'unhide confirmation password' : 'hide confirmation password'"
+                  @click="() => { showConfirmationPassword = !showConfirmationPassword }" variant="outline">
                   <Eye v-if="!showConfirmationPassword" />
                   <EyeOff v-else />
                 </Button>
               </div>
-              <FormDescription class="flex justify-between">
-                <p>Enter confirmation password.</p>
-              </FormDescription>
-              <FormMessage />
+              <FormDescription class="flex flex-col">
+              <span class="text-destructive">{{ validation.confirmPassword }}</span>
+            </FormDescription>
             </FormItem>
           </div>
         </FormField>
@@ -155,7 +164,7 @@ const regist = async () => {
     </CardContent>
     <CardFooter class="mx-0 px-2 flex justify-between">
       <Button variant="link" @click="navigateTo('/')">Back to home</Button>
-      <Button variant="link" @click="navigateTo('/login')">Have an account?</Button>
+      <Button variant="link" @click="navigateTo('/login')">Already have an account?</Button>
     </CardFooter>
   </Card>
 
