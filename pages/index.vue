@@ -85,11 +85,9 @@ const searchBook = async (searchInput: string) => {
   try {
     statusResponse.value = 'pending'
     const url = URLVolumes + '?q=' + encodeURI(searchInput);
-    console.log(url)
     const response: any = await $fetch(url);
     statusResponse.value = 'success'
     // data.value = response.items
-    console.log(response)
   } catch (error) {
     statusResponse.value = 'error'
   }

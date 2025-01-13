@@ -67,7 +67,6 @@ const fetchData = async (resetPage?: boolean) => {
       return { [field]: { contain: filter.value?.search } };
     })
     : {};
-  console.log({ searchQuery })
   const options = defu(
     props.fetch.opts,
     { query: { where: filter.value.filter } },
@@ -75,12 +74,11 @@ const fetchData = async (resetPage?: boolean) => {
     { query: { search: searchQuery } }
   );
   try {
-    console.log("props.fetch.request", props.fetch.request, options)
     const response: any = await $fetch(props.fetch.request, options);
     items.value = response.rows;
     metadata.value.total = response.metadata.total;
   } catch (err: any) {
-    Swal.fire("Informasi", err.data.message, "info");
+    Swal.fire("Information", err.data.message, "info");
   }
   loading.value = false;
 };

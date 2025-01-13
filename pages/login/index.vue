@@ -17,6 +17,21 @@ const showPassword = ref(false)
 
 const { authenticate } = useCurrentUserStore();
 
+interface ValidationMessages {
+  username?: string;
+  password?: string;
+}
+
+const validation = ref<ValidationMessages>({});
+
+const model: Ref<{
+  username: string;
+  password: string;
+}> = ref({
+  username: "",
+  password: "",
+});
+
 const login = async () => {
   isLoading.value = true;
   errorMessage.value = undefined;
@@ -32,12 +47,21 @@ const login = async () => {
       });
     })
     .catch((error) => {
+      validation.value = {}
       errorMessage.value = error.data.message;
       Swal.fire({
         icon: "error",
-        title: "Login Gagal",
+        title: "Failed to Login",
         text: errorMessage.value,
       });
+      const errorData = error.data;
+      if (errorData.statusCode === 422) {
+        for (let i = 0; i < errorData.data.length; i++) {
+          const keyPath: 'username' | 'password' = errorData.data[i].path[0]
+          const errMessage: string = errorData.data[i].message;
+          validation.value[keyPath] = errMessage;
+        }
+      }
     })
     .finally(() => {
       isLoading.value = false;
@@ -57,18 +81,18 @@ const login = async () => {
           <FormItem class="mb-2">
             <FormLabel>Username</FormLabel>
             <FormControl>
-              <Input class="h-full" type="text" placeholder="Username" autocomplete="off" v-model="credential.username"
+              <Input :class="validation.username ? 'border-destructive' : 'border-input'" class="h-full" type="text" placeholder="Username" autocomplete="off" v-model="credential.username"
                 @keydown.enter="login" />
             </FormControl>
-            <FormDescription>
-              Enter your username.
+            <FormDescription class="flex sm:justify-start sm:items-center flex-col sm:flex-row">
+              <span class="text-destructive">{{ validation.username }}</span>
             </FormDescription>
             <FormMessage />
           </FormItem>
-          <FormItem>
+          <FormItem class="pt-2">
             <FormLabel>Password</FormLabel>
             <div class="flex flex-row gap-2">
-              <Input class="h-full" :type="showPassword ? 'text' : 'password'" placeholder="Password" autocomplete="off"
+              <Input :class="validation.password ? 'border-destructive' : 'border-input'" class="h-full" :type="showPassword ? 'text' : 'password'" placeholder="Password" autocomplete="off"
                 v-model="credential.password" @keydown.enter="login" />
               <Button @click="() => { showPassword = !showPassword }" variant="outline" class="aspect-square flex"
                 :title="!showPassword ? 'unhide password' : 'hide password'">
@@ -76,14 +100,15 @@ const login = async () => {
                 <EyeOff v-else />
               </Button>
             </div>
-            <FormDescription class="flex justify-between">
-              <p>Enter your password.</p>
-              <Button variant="link" class="px-0" @click="navigateTo('#')">Forgot password?</Button>
+            <FormDescription class="flex sm:justify-between sm:items-center flex-col sm:flex-row p-0 m-0"
+              style="margin: 0;">
+              <span class="text-destructive m-0 p-0">{{ validation.password }}</span>
+              <Button variant="link" class="p-0" @click="navigateTo('#')">Forgot password?</Button>
             </FormDescription>
             <FormMessage />
           </FormItem>
         </FormField>
-        <div class="flex justify-end">
+        <div class="flex justify-end pt-2">
           <Button type="button" @click="login" v-bind:disabled="isLoading">
             <Loader2 class="w-4 h-4 mr-2 animate-spin" v-if="isLoading" />
             <Send v-else />
