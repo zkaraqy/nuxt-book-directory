@@ -66,10 +66,39 @@ interface BookModel {
   infoLink?: string;
 }
 
+interface CardBook {
+  id?: string;
+  volumeInfo?: {
+    title?: string;
+    authors?: string[];
+    publisher?: string;
+    publishedDate?: string;
+    averageRating?: number;
+    ratingsCount?: number;
+    imageLinks?: {
+      thumbnail?: string;
+    };
+    infoLink?: string;
+  }
+}
+
+interface DashboardResponse {
+  totalBookSaved: number;
+  totalFavorites: number;
+  totalBookInReadlist: number;
+  totalBookWaiting: number;
+  totalBookOnRead: number;
+  totalBookPaused: number;
+  totalBookFinished: number;
+  totalBookOnRereading: number;
+}
+
 declare global {
   type Book = Book;
   type BooksResponse = BooksResponse;
   type BookModel = BookModel;
   type statusType = statusType;
   type collectionType = collectionType;
+  type CardBook = CardBook;
+  type DashboardResponse = DashboardResponse;
 }

@@ -1,6 +1,35 @@
 <template>
   <div class="container h-full rounded flex flex-col">
-    <h1 class="text-2xl mt-4 font-mono">Statistic</h1>
+    <div class="flex mt-4 justify-between items-center">
+      <h1 class="text-2xl font-mono">Statistic</h1>
+      <Popover>
+        <PopoverTrigger as-child>
+          <Button variant="outline" :class="cn(
+            'w-[280px] justify-start text-left font-normal',
+            !value && 'text-muted-foreground',
+          )">
+            <CalendarIcon class="mr-2 h-4 w-4" />
+            <template v-if="value.start">
+              <template v-if="value.end">
+                {{ df.format(value.start.toDate(getLocalTimeZone())) }} - {{
+                  df.format(value.end.toDate(getLocalTimeZone())) }}
+              </template>
+
+              <template v-else>
+                {{ df.format(value.start.toDate(getLocalTimeZone())) }}
+              </template>
+            </template>
+            <template v-else>
+              Pick a date
+            </template>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent class="w-auto p-0">
+          <RangeCalendar v-model="value" initial-focus :number-of-months="2"
+            @update:start-value="(startDate) => value.start = startDate" />
+        </PopoverContent>
+      </Popover>
+    </div>
     <div class="flex gap-4">
       <div class="mt-4 p-2 flex flex-row w-[14rem] h-[5rem] border rounded-md shadow-sm gap-2">
         <div class="flex flex-row justify-center items-center w-[30%] h-full">
@@ -16,7 +45,7 @@
           </TooltipProvider>
         </div>
         <div class="flex flex-col truncate justify-center  text-lg w-[70%] h-full">
-          <p class="truncate" title="Book saved">0 Books saved</p>
+          <p class="truncate" title="Book saved">{{ model?.totalBookSaved }} Books saved</p>
         </div>
       </div>
       <div class="mt-4 p-2 flex flex-row w-[14rem] h-[5rem] border rounded-md shadow-sm gap-2">
@@ -33,7 +62,7 @@
           </TooltipProvider>
         </div>
         <div class="flex flex-col truncate justify-center  text-lg w-[70%] h-full">
-          <p class="truncate" title="Favorites">0 Favorites</p>
+          <p class="truncate" title="Favorites">{{ model?.totalFavorites }} Favorites</p>
         </div>
       </div>
       <div class="mt-4 p-2 flex flex-row w-[14rem] h-[5rem] border rounded-md shadow-sm gap-2">
@@ -50,7 +79,7 @@
           </TooltipProvider>
         </div>
         <div class="flex flex-col truncate justify-center  text-lg w-[70%] h-full">
-          <p class="truncate" title="Book in readlist">0 Books in readlist</p>
+          <p class="truncate" title="Book in readlist">{{ model?.totalBookInReadlist }} Books in readlist</p>
         </div>
       </div>
     </div>
@@ -71,7 +100,7 @@
           </TooltipProvider>
         </div>
         <div class="flex flex-col truncate justify-center  text-lg w-[70%] h-full">
-          <p class="truncate" title="Waiting">0 Waiting</p>
+          <p class="truncate" title="Waiting">{{ model?.totalBookWaiting }} Waiting</p>
         </div>
       </div>
       <div class="mt-4 p-2 flex flex-row w-[14rem] h-[5rem] border rounded-md shadow-sm gap-2">
@@ -88,7 +117,7 @@
           </TooltipProvider>
         </div>
         <div class="flex flex-col truncate justify-center  text-lg w-[70%] h-full">
-          <p class="truncate" title="Currently reading">0 Currently reading</p>
+          <p class="truncate" title="Currently reading">{{ model?.totalBookOnRead }} Currently reading</p>
         </div>
       </div>
       <div class="mt-4 p-2 flex flex-row w-[14rem] h-[5rem] border rounded-md shadow-sm gap-2">
@@ -105,7 +134,7 @@
           </TooltipProvider>
         </div>
         <div class="flex flex-col truncate justify-center  text-lg w-[70%] h-full">
-          <p class="truncate" title="Paused ">0 Paused</p>
+          <p class="truncate" title="Paused ">{{ model?.totalBookPaused }} Paused</p>
         </div>
       </div>
     </div>
@@ -126,7 +155,7 @@
           </TooltipProvider>
         </div>
         <div class="flex flex-col truncate justify-center  text-lg w-[70%] h-full">
-          <p class="truncate" title="Finished books">0 Finished books</p>
+          <p class="truncate" title="Finished books">{{ model?.totalBookFinished }} Finished books</p>
         </div>
       </div>
       <div class="mt-4 p-2 flex flex-row w-[14rem] h-[5rem] border rounded-md shadow-sm gap-2">
@@ -143,7 +172,7 @@
           </TooltipProvider>
         </div>
         <div class="flex flex-col truncate justify-center  text-lg w-[70%] h-full">
-          <p class="truncate" title="Rereading books">0 Rereading books</p>
+          <p class="truncate" title="Rereading books">{{ model?.totalBookOnRereading }} Rereading books</p>
         </div>
       </div>
     </div>
@@ -151,10 +180,30 @@
 </template>
 
 <script lang="ts" setup>
+import type { DateRange } from 'radix-vue'
+import { Button } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { RangeCalendar } from '@/components/ui/range-calendar'
+import { cn } from '@/lib/utils'
+import {
+  CalendarDate,
+  DateFormatter,
+  getLocalTimeZone,
+} from '@internationalized/date'
+import { Calendar as CalendarIcon } from 'lucide-vue-next'
 import { Book, BookOpen, BookOpenText, BookOpenCheck, BookHeart, BookMarked } from 'lucide-vue-next';
 
 const userStore = useCurrentUserStore();
-const { profile } = userStore
+const { profile } = userStore;
+
+const df = new DateFormatter('en-US', {
+  dateStyle: 'medium',
+})
+
+const value = ref({
+  start: new CalendarDate(2022, 1, 20),
+  end: new CalendarDate(2022, 1, 20).add({ days: 20 }),
+}) as Ref<DateRange>
 
 definePageMeta({
   layout: "user",
@@ -165,6 +214,23 @@ useHead({
   title: profile.name + " | Book Directory"
 })
 
+const model = ref<DashboardResponse>()
+
+onMounted(() => {
+  Promise.allSettled([
+    $fetch('/api/dashboard', { params: { id: userStore.profile.id } })
+  ])
+    .then(([data]) => {
+      if (data.status === "fulfilled") {
+        model.value = data.value;
+      }
+    })
+})
+
 </script>
 
-<style></style>
+<style scoped>
+* {
+  /* border: 1px solid red; */
+}
+</style>

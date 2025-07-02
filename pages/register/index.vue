@@ -65,7 +65,6 @@ const regist = async () => {
       })
   } catch (err: any) {
     validation.value = {}
-    Swal.fire("Information", err.data.message ?? err.message, "error");
     const errorData = err.data;
     if (errorData.statusCode === 422) {
       for (let i = 0; i < errorData.data.length; i++) {
