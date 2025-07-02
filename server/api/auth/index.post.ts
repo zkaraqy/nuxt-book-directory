@@ -8,8 +8,13 @@ import {
 import { useValidatedBody } from "~~/server/utils/use-validated-body";
 
 const authSchema = z.object({
-  username: z.string(),
-  password: z.string(),
+  username: z
+    .string({ message: "Username is required" })
+    .min(5, { message: "Username length at least 5 character" }),
+  password: z
+    .string({ message: "Password is required" })
+    .min(8, { message: "Password length at least 8 character" })
+    .max(255, { message: "Your password is too long" }),
 });
 
 export default defineEventHandler(async (event) => {
@@ -22,10 +27,8 @@ export default defineEventHandler(async (event) => {
     user &&
     (await comparePassword(data.password, user?.dataValues.password!))
   ) {
-    
-    const accessToken = encodeAccessToken(user.toJSON(), event);
+    const accessToken = encodeAccessToken(user, event);
     const refreshToken = encodeRefreshToken(user.dataValues.id!.toString());
-
     return {
       accessToken,
       refreshToken,
