@@ -3,7 +3,7 @@
     <div class="flex justify-center items-center">
       <HomeSearchBook :handle-on-click="searchBook" />
     </div>
-    <h1 class="text-center" v-if="statusResponse === 'error'">There's an error ocurred 👎</h1>
+    <h1 class="text-center" v-if="statusResponse === 'error'" v-html="errorMessage"></h1>
     <div iv class="flex justify-start items-start">
       <div class="flex w-full flex-wrap gap-4 container justify-evenly items-start mt-4">
         <template v-for="(i, j) in 10">
@@ -24,33 +24,33 @@
           </div>
         </template>
         <template v-if="statusResponse === 'success'" v-for="(book, index) in data">
-          <Card
+          <Card :id="index"
             class="flex flex-col sm:flex-row w-52 sm:w-96 bg-white border border-gray-200 rounded-md shadow-sm overflow-hidden">
-            <img v-if="book.volumeInfo.imageLinks?.thumbnail" :src="book.volumeInfo.imageLinks.thumbnail"
+            <NuxtImg v-if="book?.volumeInfo?.imageLinks?.thumbnail" :src="book?.volumeInfo?.imageLinks?.thumbnail"
               alt="Book Thumbnail" class="w-auto h-20 sm:h-auto object-cover" />
             <div class="flex flex-col justify-between">
               <CardHeader class="p-4">
                 <CardTitle class="text-sm font-semibold text-gray-900">
-                  {{ book.volumeInfo.title }}
+                  {{ book?.volumeInfo?.title }}
                 </CardTitle>
                 <CardDescription class="text-xs text-gray-500 mt-1">
-                  <p>{{ book.volumeInfo.publisher }} <span v-if="book.volumeInfo.publishedDate">| {{
+                  <p>{{ book?.volumeInfo?.publisher }} <span v-if="book?.volumeInfo?.publishedDate">| {{
                     book.volumeInfo.publishedDate }}</span></p>
                   <p class="mt-2 flex gap-1 justify-start items-center">
-                    <Star :size="14" /> {{ book.volumeInfo.averageRating ?? 'No data' }}
+                    <Star :size="14" /> {{ book?.volumeInfo?.averageRating ?? 'No data' }} {{ book?.volumeInfo?.ratingsCount ? `(${book?.volumeInfo?.ratingsCount})` : '' }}
                   </p>
                 </CardDescription>
               </CardHeader>
               <CardFooter class="mt-2 p-4 flex gap-2">
-                <a type="button" :href="book.volumeInfo.infoLink" target="_blank"
+                <a type="button" :href="book?.volumeInfo?.infoLink" target="_blank"
                   class="px-3 py-1.5 text-xs text-white bg-blue-500 rounded shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1">
-                  Learn More
+                  See More
                 </a>
-                <Button @click="saveBook(book.id, 'Favorites')" title="save to favorites" variant="destructive"
+                <Button @click="saveBook(book.id!, 'Favorites')" title="save to favorites" variant="destructive"
                   class="h-full px-1.5 py-1.5">
                   <Heart />
                 </Button>
-                <Button @click="saveBook(book.id, 'Readlist')" title="save to readlist" variant="outline"
+                <Button @click="saveBook(book.id!, 'Readlist')" title="save to readlist" variant="outline"
                   class="h-full px-1.5 py-1.5">
                   <Bookmark />
                 </Button>
@@ -72,12 +72,13 @@ useHead({
 
 import Swal from 'sweetalert2';
 const statusResponse = ref("success")
+const errorMessage = ref("")
 const { URLVolumes } = useMyGoogleBooksAPIStore();
 const { profile, isLogged } = useCurrentUserStore()
 const dummy_data = dummyData();
 
-const data = dummy_data.items;
-// const data = ref();
+// const data = dummy_data.items;
+const data = ref<CardBook[]>([]);
 // const data = dummy_data.items[0];
 // const { volumeInfo } = data;
 
@@ -87,9 +88,20 @@ const searchBook = async (searchInput: string) => {
     const url = URLVolumes + '?q=' + encodeURI(searchInput);
     const response: any = await $fetch(url);
     statusResponse.value = 'success'
-    // data.value = response.items
-  } catch (error) {
+    data.value = response.items
+  } catch (err:any) {
     statusResponse.value = 'error'
+    const error = err.data.error;
+    console.log(error)
+    if (error.code === 400) {
+      errorMessage.value = "<span>"
+      for (let i = 0; i < error.errors.length; i++) {
+        errorMessage.value += error.errors[i].message + "<br>";
+      }
+      errorMessage.value += "</span>"
+    } else {
+      errorMessage.value = "There's an error ocurred 👎"
+    }
   }
 }
 

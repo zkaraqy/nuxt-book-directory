@@ -49,11 +49,6 @@ const login = async () => {
     .catch((error) => {
       validation.value = {}
       errorMessage.value = error.data.message;
-      Swal.fire({
-        icon: "error",
-        title: "Failed to Login",
-        text: errorMessage.value,
-      });
       const errorData = error.data;
       if (errorData.statusCode === 422) {
         for (let i = 0; i < errorData.data.length; i++) {

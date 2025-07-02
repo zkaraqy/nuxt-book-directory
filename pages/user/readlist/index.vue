@@ -118,7 +118,12 @@
     <DataGrid ref="grid" :use-filter-search="true" :headers="headers" :fetch="fetch" show-index sort-by="updated_at"
       sort-type="desc">
       <template #item-imageLinks.thumbnail="item">
-        <NuxtImg :src="item.imageLinks.thumbnail" />
+        <NuxtImg :src="item.imageLinks.thumbnail" class="min-w-32" />
+      </template>
+      <template #item-title="item">
+        <div class="max-w-80 truncate" :title="item.title">
+          {{ item.title }}
+        </div>
       </template>
       <template #item-updated_at="item">
         <div class="max-w-32 truncate" :title="formatTanggal(item.updated_at)">
@@ -132,7 +137,7 @@
         </Badge>
       </template>
       <template #item-id="item">
-        <div class="flex flex-row gap-1">
+        <div class="flex flex-col md:flex-row gap-1">
           <Button @click="edit(item.id)" class="aspect-square p-0 on-hover-btn-edit">
             <Pencil :size="20" class="aspect-square p-0 " color="#586e00" />
           </Button>
@@ -288,9 +293,9 @@ const useToast = async (type: ToastType, message: string, title?: string) => {
 </script>
 
 <style scoped>
-/* * {
-  border: 1px dotted red;
-} */
+* {
+  /* border: 1px dotted red; */
+}
 
 .on-hover-btn-edit {
   background-color: #d4ed6f;
