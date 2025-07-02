@@ -1,7 +1,8 @@
 import { useMyGoogleBooksAPIStore } from "~/stores/google-books-API";
 import { SavedBook } from "~~/server/models";
 import { useGridParam } from "~~/server/utils/params-handler";
-
+import dotenv from "dotenv"
+dotenv.config();
 const isEmpty = (obj: object) => Object.keys(obj).length === 0;
 
 export default defineEventHandler(async (event): Promise<BooksResponse | undefined> => {
@@ -28,7 +29,7 @@ export default defineEventHandler(async (event): Promise<BooksResponse | undefin
           googleAPIs.URLVolumes +
             "/" +
             book.bookId +
-            "?key=AIzaSyCG_l9L2D_PXDGnMlUAJTvKqDTVeOikaiI"
+            "?key=" + process.env.API_KEY
         );
         return {
           id: book.id,
