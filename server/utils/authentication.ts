@@ -32,8 +32,9 @@ export const encodeAccessToken = (
     ...{
       id: userPayload.id,
       email: userPayload.email,
-      username: userPayload.username,
       name: userPayload.name,
+      role: userPayload.role,
+      status: userPayload.status,
     },
   };
   const token = jwt.sign(payload, jwtAccessSecret as string, {
