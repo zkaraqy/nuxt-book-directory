@@ -12,8 +12,7 @@ export default defineEventHandler(
       const fetchedBook: { [key: string]: any } = await $fetch(
         googleAPIs.URLVolumes +
           "/" +
-          bookId +
-          "?key=AIzaSyCG_l9L2D_PXDGnMlUAJTvKqDTVeOikaiI"
+          bookId
       );
 
       const res = await SavedBook.findByPk(id);
@@ -24,6 +23,7 @@ export default defineEventHandler(
         ...fetchedBook.volumeInfo,
       };
     } catch (error: any) {
+      throw error
       if (error.statusCode === 429) {
         throw createError({
           statusCode: 429,
