@@ -26,8 +26,8 @@
         <template v-if="statusResponse === 'success'" v-for="(book, index) in data">
           <Card :id="index"
             class="flex flex-col sm:flex-row w-52 sm:w-96 bg-white border border-gray-200 rounded-md shadow-sm overflow-hidden">
-            <NuxtImg v-if="book?.volumeInfo?.imageLinks?.thumbnail" :src="book?.volumeInfo?.imageLinks?.thumbnail"
-              alt="Book Thumbnail" class="w-auto h-20 sm:h-auto object-cover" />
+            <NuxtImg v-if="book?.volumeInfo?.imageLinks?.thumbnail" :src="book?.volumeInfo?.imageLinks?.thumbnail.replace('http://', 'https://')"
+              alt="Book Thumbnail" class="w-full h-20 sm:h-auto object-cover" />
             <div class="flex flex-col justify-between">
               <CardHeader class="p-4">
                 <CardTitle class="text-sm font-semibold text-gray-900">
