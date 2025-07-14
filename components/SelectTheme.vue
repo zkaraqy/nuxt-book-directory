@@ -6,6 +6,7 @@ import { Icon } from '@iconify/vue'
 const colorMode = useColorMode()
 const changeTheme = (theme: string) => {
   colorMode.preference = theme;
+  console.log(colorMode.preference)
 }
 </script>
 

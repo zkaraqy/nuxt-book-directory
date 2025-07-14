@@ -72,7 +72,7 @@ export const useValidatedBody = async (
     } else {
       throw createError({
         statusCode: 422,
-        statusMessage: "There are mistakes in the form",
+        statusMessage: "Terdapat Kesalahan Pada Isian",
         data: result.error.issues,
       });
     }
