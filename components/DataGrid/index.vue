@@ -78,7 +78,7 @@ const fetchData = async (resetPage?: boolean) => {
     items.value = response.rows;
     metadata.value.total = response.metadata.total;
   } catch (err: any) {
-    Swal.fire("Information", err.data.message, "info");
+    Swal.fire("Information", err.data?.message, "info");
   }
   loading.value = false;
 };

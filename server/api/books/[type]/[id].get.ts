@@ -28,8 +28,7 @@ export default defineEventHandler(async (event): Promise<BooksResponse | undefin
         const bookFromGoogleAPI: { [key: string]: any } = await $fetch(
           googleAPIs.URLVolumes +
             "/" +
-            book.bookId +
-            "?key=" + process.env.API_KEY
+            book.bookId 
         );
         return {
           id: book.id,
@@ -56,6 +55,7 @@ export default defineEventHandler(async (event): Promise<BooksResponse | undefin
       },
     };
   } catch (error: any) {
+    throw error
     if (error.statusCode === 429) {
       throw createError({
         statusCode: 429,
