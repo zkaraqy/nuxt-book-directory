@@ -25,10 +25,13 @@
         </template>
         <template v-if="statusResponse === 'success'" v-for="(book, index) in data">
           <Card :id="index"
-            class="flex flex-col sm:flex-row w-52 sm:w-96 bg-white border border-gray-200 rounded-md shadow-sm overflow-hidden">
-            <NuxtImg v-if="book?.volumeInfo?.imageLinks?.thumbnail" :src="book?.volumeInfo?.imageLinks?.thumbnail.replace('http://', 'https://')"
-              alt="Book Thumbnail" class="w-full h-20 sm:h-auto object-cover" />
-            <div class="flex flex-col justify-between">
+            class="flex flex-col h-full sm:flex-row w-52 sm:w-96 bg-white border border-gray-200 rounded-md shadow-sm overflow-hidden">
+            <div class="h-full flex col-span-2">
+              <NuxtImg v-if="book?.volumeInfo?.imageLinks?.thumbnail"
+                :src="book?.volumeInfo?.imageLinks?.thumbnail.replace('http://', 'https://')" alt="Book Thumbnail"
+                class="w-auto h-[200px] object-cover" />
+            </div>
+            <div class="flex flex-col justify-between col-span-10">
               <CardHeader class="p-4">
                 <CardTitle class="text-sm font-semibold text-gray-900">
                   {{ book?.volumeInfo?.title }}
@@ -37,7 +40,8 @@
                   <p>{{ book?.volumeInfo?.publisher }} <span v-if="book?.volumeInfo?.publishedDate">| {{
                     book.volumeInfo.publishedDate }}</span></p>
                   <p class="mt-2 flex gap-1 justify-start items-center">
-                    <Star :size="14" /> {{ book?.volumeInfo?.averageRating ?? 'No data' }} {{ book?.volumeInfo?.ratingsCount ? `(${book?.volumeInfo?.ratingsCount})` : '' }}
+                    <Star :size="14" /> {{ book?.volumeInfo?.averageRating ?? 'No data' }} {{
+                      book?.volumeInfo?.ratingsCount ? `(${book?.volumeInfo?.ratingsCount})` : '' }}
                   </p>
                 </CardDescription>
               </CardHeader>
@@ -89,7 +93,7 @@ const searchBook = async (searchInput: string) => {
     const response: any = await $fetch(url);
     statusResponse.value = 'success'
     data.value = response.items
-  } catch (err:any) {
+  } catch (err: any) {
     statusResponse.value = 'error'
     const error = err.data.error;
     console.log(error)
