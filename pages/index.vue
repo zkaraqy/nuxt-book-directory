@@ -71,7 +71,7 @@
 import { Loader2, Heart, Bookmark, Star } from 'lucide-vue-next';
 
 useHead({
-  title: "Book Directory"
+  title: "Book Directory TES"
 })
 
 import Swal from 'sweetalert2';
